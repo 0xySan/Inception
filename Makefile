@@ -1,5 +1,3 @@
-DOCKER_COMPOSE = sudo docker-compose -f srcs/docker-compose.yml
-
 ENV_FILE := srcs/.env
 ifeq (,$(wildcard $(ENV_FILE)))
   $(error "$(ENV_FILE) is missing, please create it with LOGIN=<your-login>")
@@ -13,7 +11,7 @@ MYSQL_DIR := $(DATA_DIR)/mysql
 WP_DIR    := $(DATA_DIR)/wordpress
 
 SUDO := sudo -E
-COMPOSE := $(SUDO) docker-compose -f ./srcs/docker-compose.yaml
+COMPOSE := $(SUDO) docker-compose -f ./srcs/docker-compose.yml
 
 .PHONY: all build up log down stop start clean fclean status
 
@@ -63,7 +61,7 @@ status:
 	@sudo docker ps
 
 logs:
-	$(DOCKER_COMPOSE) logs -f
+	$(COMPOSE) logs -f
 
 re: fclean up
 
