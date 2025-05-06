@@ -1,0 +1,116 @@
+services:
+  nginx:
+    container_name: nginx
+    build:
+      context: ./requirements/nginx
+    depends_on:
+      wordpress:
+        condition: service_healthy
+    env_file:
+      - .env
+    ports:
+      - "443:443"
+    volumes:
+      - wordpress_data:/var/www/html
+    restart: unless-stopped
+    networks:
+      - network
+
+  wordpress:
+    container_name: wordpress
+    build:
+      context: ./requirements/wordpress
+    depends_on:
+      - mariadb
+    env_file:
+      - .env
+    volumes:
+      - wordpress_data:/var/www/html
+    restart: unless-stopped
+    networks:
+      - network
+    healthcheck:
+      test: ["CMD", "sh", "-c", "nc -z localhost 9000"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  mariadb:
+    container_name: mariadb
+    build:
+      context: ./requirements/mariadb
+    env_file:
+      - .env
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    restart: unless-stopped
+    networks:
+      - network
+  
+  sftp:
+    build:
+      context: ./requirements/sftp
+      args:
+        FTP_USER: ${FTP_USER}
+        FTP_PASSWORD: ${FTP_PASSWORD}
+    container_name: sftp
+    ports:
+      - "2222:22"
+    env_file:
+      - .env
+    volumes:
+      - wordpress_data:/home/${FTP_USER}/upload
+    networks:
+      - network
+    restart: unless-stopped
+  
+  adminer:
+    build:
+      context: ./requirements/adminer
+    container_name: adminer
+    depends_on:
+      - mariadb
+    env_file:
+      - .env
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+    networks:
+      - network
+  redis:
+    build:
+      context: ./requirements/redis
+    container_name: redis
+    expose:
+      - "6379"
+    networks:
+      - network
+    restart: unless-stopped
+
+  umami:
+    build: ./umami
+    container_name: umami
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    depends_on:
+      - mariadb
+
+networks:
+  network:
+    driver: bridge
+
+volumes:
+  mariadb_data:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/${USERNAME}/data/mysql
+      o: bind
+  wordpress_data:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/${USERNAME}/data/wordpress
+      o: bind

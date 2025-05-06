@@ -11,15 +11,16 @@ MYSQL_DIR := $(DATA_DIR)/mysql
 WP_DIR    := $(DATA_DIR)/wordpress
 
 SUDO := sudo -E
-COMPOSE := $(SUDO) docker-compose -f ./srcs/docker-compose.yml
+COMPOSE := $(SUDO) docker-compose -f ./srcs/docker-compose.yaml
 
 .PHONY: all build up log down stop start clean fclean status
 
 all: up
 
 build:
+	@sudo systemctl restart docker
 	@echo "[+] Creating host dirs for volumes…"
-	@mkdir -p $(MYSQL_DIR) $(WP_DIR)
+	@sudo mkdir -p $(MYSQL_DIR) $(WP_DIR)
 	@sudo chmod 775 $(DATA_DIR)
 	@echo "[+] Building Docker images…"
 	@$(COMPOSE) build
@@ -49,7 +50,7 @@ clean:
 	@$(COMPOSE) down -v --rmi all
 	@sudo docker system prune -af
 
-fclean:
+fclean: clean
 	@echo "[+] Full clean (Docker + host data)…"
 	@sudo docker system prune -af
 	@sudo docker volume prune -f
