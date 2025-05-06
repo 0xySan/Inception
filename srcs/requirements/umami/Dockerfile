@@ -12,3 +12,9 @@ RUN apk update && \
     g++ \
     openssl
 
+COPY ./tools/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+EXPOSE 3000
+
+CMD ["/entrypoint.sh"]

@@ -88,7 +88,7 @@ services:
     restart: unless-stopped
 
   umami:
-    build: ./umami
+    build: ./requirements/umami
     container_name: umami
     ports:
       - "3000:3000"
