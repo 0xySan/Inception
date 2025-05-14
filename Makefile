@@ -9,6 +9,7 @@ export LOGIN
 DATA_DIR  := $(HOME)/data
 MYSQL_DIR := $(DATA_DIR)/mysql
 WP_DIR    := $(DATA_DIR)/wordpress
+UPTIMEKUMA    := $(DATA_DIR)/uptimekuma
 
 SUDO := sudo -E
 COMPOSE := $(SUDO) docker-compose -f ./srcs/docker-compose.yaml
@@ -20,7 +21,7 @@ all: up
 build:
 	@sudo systemctl restart docker
 	@echo "[+] Creating host dirs for volumes…"
-	@sudo mkdir -p $(MYSQL_DIR) $(WP_DIR)
+	@sudo mkdir -p $(MYSQL_DIR) $(WP_DIR) $(UPTIMEKUMA)
 	@sudo chmod 775 $(DATA_DIR)
 	@echo "[+] Building Docker images…"
 	@$(COMPOSE) build

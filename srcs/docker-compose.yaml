@@ -46,6 +46,11 @@ services:
     restart: unless-stopped
     networks:
       - network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
   
   sftp:
     build:
@@ -77,6 +82,7 @@ services:
     restart: unless-stopped
     networks:
       - network
+
   redis:
     build:
       context: ./requirements/redis
@@ -87,15 +93,20 @@ services:
       - network
     restart: unless-stopped
 
-  umami:
-    build: ./requirements/umami
-    container_name: umami
+  uptimekuma:
+    build: ./requirements/uptimekuma
+    container_name: uptimekuma
+    volumes:
+      - uptimekuma_data:/app/data
     ports:
-      - "3000:3000"
-    env_file:
-      - .env
+      - "3001:3001"
+    networks:
+      - network
     depends_on:
       - mariadb
+    env_file:
+      - .env
+    restart: unless-stopped
 
 networks:
   network:
@@ -107,6 +118,12 @@ volumes:
     driver_opts:
       type: none
       device: /home/${USERNAME}/data/mysql
+      o: bind
+  uptimekuma_data:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/${USERNAME}/data/uptimekuma
       o: bind
   wordpress_data:
     driver: local

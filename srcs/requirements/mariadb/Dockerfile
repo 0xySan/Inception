@@ -8,6 +8,7 @@ RUN mkdir -p /run/mysqld && \
 
 COPY ./conf/my.cnf /etc/my.cnf
 COPY ./tools/entrypoint.sh /usr/local/bin/entrypoint.sh
+COPY ./conf/kuma.sql /usr/local/bin/kuma.sql
 
 RUN chmod 644 /etc/my.cnf && \
     chmod 755 /usr/local/bin/entrypoint.sh && \
@@ -15,6 +16,5 @@ RUN chmod 644 /etc/my.cnf && \
     chown mysql:mysql /usr/local/bin/entrypoint.sh
 
 EXPOSE 3306
-
 
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
